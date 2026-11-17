@@ -25,50 +25,61 @@ import ar.edu.unju.escmi.tp8.service.IEmpresaService;
 @RequestMapping("/api/empresas")
 public class EmpresaController {
 
-	@Autowired
-	private IEmpresaService empresaService;
+    @Autowired
+    private IEmpresaService empresaService;
 
-	/** GET /api/empresas -> lista de todas las empresas (200). */
-	@GetMapping
-	public ResponseEntity<List<Empresa>> obtenerEmpresas() {
-		return ResponseEntity.ok(empresaService.obtenerEmpresas());
-	}
+    /** GET /api/empresas -> lista de todas las empresas (200). */
+    @GetMapping
+    public ResponseEntity<List<Empresa>> obtenerEmpresas() {
+        return ResponseEntity.ok(empresaService.obtenerEmpresas());
+    }
 
-	/** GET /api/empresas/{id} -> la empresa con ese id (200) o 404 si no existe. */
-	@GetMapping("/{id}")
-	public ResponseEntity<Empresa> obtenerEmpresaPorId(@PathVariable Long id) {
-		Empresa empresa = empresaService.obtenerEmpresaPorId(id);
-		if (empresa == null) {
-			return ResponseEntity.notFound().build();
-		}
-		return ResponseEntity.ok(empresa);
-	}
+    /** GET /api/empresas/{id} -> empresa por ID (200 o 404). */
+    @GetMapping("/{id}")
+    public ResponseEntity<Empresa> obtenerEmpresaPorId(@PathVariable int id) {
+        Empresa empresa = empresaService.buscarEmpresaId(id);
 
-	/** POST /api/empresas -> alta de una empresa enviada en el body como JSON (201). */
-	@PostMapping
-	public ResponseEntity<Empresa> guardarEmpresa(@RequestBody Empresa empresa) {
-		Empresa empresaGuardada = empresaService.guardarEmpresa(empresa);
-		return ResponseEntity.status(HttpStatus.CREATED).body(empresaGuardada);
-	}
+        if (empresa == null) {
+            return ResponseEntity.notFound().build();
+        }
 
-	/** PUT /api/empresas/{id} -> modificación completa de la empresa (200) o 404 si no existe. */
-	@PutMapping("/{id}")
-	public ResponseEntity<Empresa> modificarEmpresa(@PathVariable Long id, @RequestBody Empresa empresa) {
-		empresa.setId(id); // el id de la URL indica qué empresa se modifica
-		Empresa empresaModificada = empresaService.modificarEmpresa(empresa);
-		if (empresaModificada == null) {
-			return ResponseEntity.notFound().build();
-		}
-		return ResponseEntity.ok(empresaModificada);
-	}
+        return ResponseEntity.ok(empresa);
+    }
 
-	/** DELETE /api/empresas/{id} -> baja de la empresa (204) o 404 si no existe. */
-	@DeleteMapping("/{id}")
-	public ResponseEntity<Void> eliminarEmpresa(@PathVariable Long id) {
-		boolean eliminada = empresaService.eliminarEmpresa(id);
-		if (!eliminada) {
-			return ResponseEntity.notFound().build();
-		}
-		return ResponseEntity.noContent().build();
-	}
+    /** POST /api/empresas -> registrar empresa (201). */
+    @PostMapping
+    public ResponseEntity<Empresa> guardarEmpresa(@RequestBody Empresa empresa) {
+        Empresa empresaGuardada = empresaService.guardarEmpresa(empresa);
+
+        return ResponseEntity.status(HttpStatus.CREATED).body(empresaGuardada);
+    }
+
+    /** PUT /api/empresas/{id} -> modificar empresa (200 o 404). */
+    @PutMapping("/{id}")
+    public ResponseEntity<Empresa> modificarEmpresa(
+            @PathVariable int id,
+            @RequestBody Empresa empresa) {
+
+        empresa.setId(id);
+
+        Empresa empresaModificada = empresaService.modificarEmpresa(empresa);
+
+        if (empresaModificada == null) {
+            return ResponseEntity.notFound().build();
+        }
+
+        return ResponseEntity.ok(empresaModificada);
+    }
+
+    /** DELETE /api/empresas/{id} -> eliminar empresa (204 o 404). */
+    @DeleteMapping("/{id}")
+    public ResponseEntity<Void> eliminarEmpresa(@PathVariable int id) {
+        boolean eliminada = empresaService.eliminarEmpresa(id);
+
+        if (!eliminada) {
+            return ResponseEntity.notFound().build();
+        }
+
+        return ResponseEntity.noContent().build();
+    }
 }
